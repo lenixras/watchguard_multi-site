@@ -416,4 +416,4 @@ timeline
 
 ---
 
-*Projet réalisé dans le cadre de la constitution d'un portfolio infrastructure & sécurité réseau — architecture, mise en place, durcissement et exploitation d'un parc multi-site WatchGuard.*
+*Projet réalisé dans le cadre d'optimisation d'une infrastructure & sécurité réseau — architecture, mise en place, durcissement et exploitation d'un parc multi-site WatchGuard.*
