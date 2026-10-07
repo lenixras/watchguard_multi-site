@@ -112,9 +112,9 @@ flowchart TB
     A7 & A8 & A9 --- FW2
     A10 & A11 --- FW3
 
-    FW0 <==>|IPsec B1 · SITE2-MG| FW1
-    FW0 <==>|IPsec B2 · SITE3-MG| FW2
-    FW0 <==>|IPsec B3 · SITE4-MU| FW3
+    FW0 <==>|"IPsec B1 · SITE2-MG"| FW1
+    FW0 <==>|"IPsec B2 · SITE3-MG"| FW2
+    FW0 <==>|"IPsec B3 · SITE4-MU"| FW3
 
     FW0 -. "syslog :4157" .-> DIM
     FW1 -. syslog .-> DIM
