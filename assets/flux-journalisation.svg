@@ -1,0 +1,177 @@
+<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" viewBox="0 0 1200 430" width="1200" height="430" role="img" aria-label="Flux de journalisation multi-site vers WatchGuard Dimension">
+  <defs>
+    <linearGradient id="bg2" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#060b16"/>
+      <stop offset="1" stop-color="#0c1424"/>
+    </linearGradient>
+    <linearGradient id="cardg2" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#111c34"/>
+      <stop offset="1" stop-color="#0b1222"/>
+    </linearGradient>
+    <linearGradient id="bar2" x1="0" y1="1" x2="0" y2="0">
+      <stop offset="0" stop-color="#e4002b"/>
+      <stop offset="1" stop-color="#22d3ee"/>
+    </linearGradient>
+    <pattern id="grid2" width="40" height="40" patternUnits="userSpaceOnUse">
+      <path d="M40 0H0v40" fill="none" stroke="#131d34" stroke-width="1"/>
+    </pattern>
+    <filter id="glow2" x="-60%" y="-60%" width="220%" height="220%">
+      <feGaussianBlur stdDeviation="4" result="b"/>
+      <feMerge>
+        <feMergeNode in="b"/>
+        <feMergeNode in="SourceGraphic"/>
+      </feMerge>
+    </filter>
+  </defs>
+
+  <style>
+    .f  { font-family: "Segoe UI", Ubuntu, Helvetica, Arial, sans-serif; }
+    .t  { fill: #e8eefb; }
+    .m  { fill: #8ba1c6; }
+    .s  { fill: #6d84ab; }
+    .b  { font-weight: 700; }
+    .chip { fill: #16233f; stroke: #2c3f66; stroke-width: 1; }
+    .card { fill: url(#cardg2); stroke: #2a3b60; stroke-width: 1.5; }
+    @keyframes flow2 { to { stroke-dashoffset: -40; } }
+    .logline { animation: flow2 1.5s linear infinite; }
+    .outline { animation: flow2 1.8s linear infinite; }
+    @keyframes blink2 { 0%,100% { opacity: 1; } 50% { opacity: .25; } }
+    .live { animation: blink2 1.4s ease-in-out infinite; }
+  </style>
+
+  <rect width="1200" height="430" fill="url(#bg2)"/>
+  <rect width="1200" height="430" fill="url(#grid2)" opacity=".55"/>
+
+  <g class="f">
+    <rect x="34" y="22" width="6" height="40" rx="3" fill="#a78bfa"/>
+    <text x="54" y="44" class="t b" font-size="20">JOURNALISATION MULTI-SITE — WATCHGUARD DIMENSION</text>
+    <text x="54" y="64" class="s" font-size="12.5">Chaque Firebox pousse ses logs (Traffic / WebBlocker / IPS / VPN) vers une instance Dimension centralisée</text>
+  </g>
+
+  <!-- ================= FLUX LOGS ================= -->
+  <g fill="none" stroke-linecap="round">
+    <path id="l1" d="M300,110 C400,110 440,175 540,192" stroke="#a78bfa" stroke-width="3" stroke-dasharray="9 7" class="logline"/>
+    <path id="l2" d="M300,195 C400,195 450,205 540,206" stroke="#a78bfa" stroke-width="3" stroke-dasharray="9 7" class="logline"/>
+    <path id="l3" d="M300,280 C400,280 450,222 540,218" stroke="#a78bfa" stroke-width="3" stroke-dasharray="9 7" class="logline"/>
+    <path id="l4" d="M300,365 C400,365 450,242 540,232" stroke="#a78bfa" stroke-width="3" stroke-dasharray="9 7" class="logline"/>
+
+    <path id="o1" d="M840,182 C900,182 910,124 960,118" stroke="#22d3ee" stroke-width="3" stroke-dasharray="9 7" class="outline"/>
+    <path id="o2" d="M840,212 L960,212" stroke="#22d3ee" stroke-width="3" stroke-dasharray="9 7" class="outline"/>
+    <path id="o3" d="M840,242 C900,242 910,300 960,306" stroke="#22d3ee" stroke-width="3" stroke-dasharray="9 7" class="outline"/>
+  </g>
+
+  <!-- paquets de logs -->
+  <g filter="url(#glow2)">
+    <circle r="5" fill="#a78bfa"><animateMotion dur="2.2s" repeatCount="indefinite"><mpath xlink:href="#l1"/></animateMotion></circle>
+    <circle r="5" fill="#a78bfa"><animateMotion dur="2.2s" begin=".4s" repeatCount="indefinite"><mpath xlink:href="#l2"/></animateMotion></circle>
+    <circle r="5" fill="#a78bfa"><animateMotion dur="2.2s" begin=".8s" repeatCount="indefinite"><mpath xlink:href="#l3"/></animateMotion></circle>
+    <circle r="5" fill="#a78bfa"><animateMotion dur="2.2s" begin="1.2s" repeatCount="indefinite"><mpath xlink:href="#l4"/></animateMotion></circle>
+    <circle r="5" fill="#22d3ee"><animateMotion dur="2s" repeatCount="indefinite"><mpath xlink:href="#o1"/></animateMotion></circle>
+    <circle r="5" fill="#22d3ee"><animateMotion dur="2s" begin=".6s" repeatCount="indefinite"><mpath xlink:href="#o2"/></animateMotion></circle>
+    <circle r="5" fill="#22d3ee"><animateMotion dur="2s" begin="1.2s" repeatCount="indefinite"><mpath xlink:href="#o3"/></animateMotion></circle>
+  </g>
+
+  <!-- ================= FIREBOX SOURCES ================= -->
+  <g class="f">
+    <g>
+      <rect x="40" y="80" width="260" height="60" rx="14" class="card"/>
+      <rect x="40" y="80" width="6" height="60" rx="3" fill="#e4002b"/>
+      <text x="62" y="106" class="t b" font-size="13">SIEGE · FIREBOX M390</text>
+      <text x="62" y="126" class="m" font-size="11">Traffic + IPS + VPN + AppCtrl</text>
+      <rect x="228" y="94" width="60" height="18" rx="9" class="chip"/>
+      <text x="258" y="107" text-anchor="middle" class="m" font-size="9.5">:4157</text>
+    </g>
+    <g>
+      <rect x="40" y="165" width="260" height="60" rx="14" class="card"/>
+      <rect x="40" y="165" width="6" height="60" rx="3" fill="#e4002b"/>
+      <text x="62" y="191" class="t b" font-size="13">AGENCE LYON · T20</text>
+      <text x="62" y="211" class="m" font-size="11">Traffic + WebBlocker + DNSWatch</text>
+      <rect x="228" y="179" width="60" height="18" rx="9" class="chip"/>
+      <text x="258" y="192" text-anchor="middle" class="m" font-size="9.5">:4157</text>
+    </g>
+    <g>
+      <rect x="40" y="250" width="260" height="60" rx="14" class="card"/>
+      <rect x="40" y="250" width="6" height="60" rx="3" fill="#e4002b"/>
+      <text x="62" y="276" class="t b" font-size="13">STRASBOURG · T20</text>
+      <text x="62" y="296" class="m" font-size="11">Traffic + WebBlocker + DNSWatch</text>
+      <rect x="228" y="264" width="60" height="18" rx="9" class="chip"/>
+      <text x="258" y="277" text-anchor="middle" class="m" font-size="9.5">:4157</text>
+    </g>
+    <g>
+      <rect x="40" y="335" width="260" height="60" rx="14" class="card"/>
+      <rect x="40" y="335" width="6" height="60" rx="3" fill="#e4002b"/>
+      <text x="62" y="361" class="t b" font-size="13">PRODUCTION · M290</text>
+      <text x="62" y="381" class="m" font-size="11">Traffic OT + alarms matériel</text>
+      <rect x="228" y="349" width="60" height="18" rx="9" class="chip"/>
+      <text x="258" y="362" text-anchor="middle" class="m" font-size="9.5">:4157</text>
+    </g>
+    <text x="40" y="414" class="s" font-size="11">Sources : tous les sites du parc</text>
+  </g>
+
+  <!-- ================= DIMENSION ================= -->
+  <g class="f">
+    <rect x="532" y="102" width="316" height="216" rx="18" fill="#a78bfa" opacity=".3"/>
+    <rect x="540" y="110" width="300" height="200" rx="16" class="card"/>
+    <rect x="540" y="110" width="300" height="4" rx="2" fill="#a78bfa"/>
+    <text x="560" y="140" class="t b" font-size="15">WATCHGUARD DIMENSION</text>
+    <text x="560" y="160" class="m" font-size="11">VM dédiée · agrégation de tous les sites</text>
+
+    <rect x="560" y="174" width="260" height="26" rx="8" class="chip"/>
+    <circle cx="576" cy="187" r="5" fill="#22c55e" class="live"/>
+    <text x="590" y="191" class="m" font-size="11">Ingestion syslog UDP 4157 (TLS)</text>
+
+    <rect x="560" y="206" width="260" height="26" rx="8" class="chip"/>
+    <text x="576" y="223" class="m" font-size="11">Stockage &amp; indexation — rétention 30 j</text>
+
+    <rect x="560" y="238" width="260" height="26" rx="8" class="chip"/>
+    <text x="576" y="255" class="m" font-size="11">Corrélation : trafic, URL, menaces, VPN</text>
+
+    <g fill="url(#bar2)">
+      <rect x="562" y="278" width="16" height="18" rx="3">
+        <animate attributeName="height" values="18;34;22;38;26" dur="2.6s" repeatCount="indefinite"/>
+        <animate attributeName="y" values="296;280;292;276;288" dur="2.6s" repeatCount="indefinite"/>
+      </rect>
+      <rect x="586" y="286" width="16" height="10" rx="3">
+        <animate attributeName="height" values="30;16;36;20;28" dur="2.6s" begin=".3s" repeatCount="indefinite"/>
+        <animate attributeName="y" values="284;298;278;294;286" dur="2.6s" begin=".3s" repeatCount="indefinite"/>
+      </rect>
+      <rect x="610" y="290" width="16" height="6" rx="3">
+        <animate attributeName="height" values="14;32;10;30;20" dur="2.6s" begin=".6s" repeatCount="indefinite"/>
+        <animate attributeName="y" values="300;282;304;284;294" dur="2.6s" begin=".6s" repeatCount="indefinite"/>
+      </rect>
+      <rect x="634" y="284" width="16" height="12" rx="3">
+        <animate attributeName="height" values="26;12;30;16;34" dur="2.6s" begin=".9s" repeatCount="indefinite"/>
+        <animate attributeName="y" values="288;302;284;298;280" dur="2.6s" begin=".9s" repeatCount="indefinite"/>
+      </rect>
+      <rect x="658" y="288" width="16" height="8" rx="3">
+        <animate attributeName="height" values="20;34;18;36;24" dur="2.6s" begin="1.2s" repeatCount="indefinite"/>
+        <animate attributeName="y" values="294;280;296;278;290" dur="2.6s" begin="1.2s" repeatCount="indefinite"/>
+      </rect>
+    </g>
+    <rect x="694" y="276" width="126" height="26" rx="13" fill="#16233f" stroke="#22d3ee" stroke-opacity=".5"/>
+    <text x="757" y="293" text-anchor="middle" fill="#7fe7f5" font-size="10.5">recherche temps réel</text>
+  </g>
+
+  <!-- ================= SORTIES ================= -->
+  <g class="f">
+    <g>
+      <rect x="960" y="86" width="210" height="64" rx="14" class="card"/>
+      <rect x="960" y="86" width="6" height="64" rx="3" fill="#22d3ee"/>
+      <text x="982" y="114" class="t b" font-size="13">RAPPORTS PLANIFIES</text>
+      <text x="982" y="134" class="m" font-size="11">Hebdo : URLs, users, menaces</text>
+    </g>
+    <g>
+      <rect x="960" y="180" width="210" height="64" rx="14" class="card"/>
+      <rect x="960" y="180" width="6" height="64" rx="3" fill="#22d3ee"/>
+      <text x="982" y="208" class="t b" font-size="13">ALERTES &amp; WEBHOOKS</text>
+      <text x="982" y="228" class="m" font-size="11">e-mail, SNMP, WatchGuard Cloud</text>
+    </g>
+    <g>
+      <rect x="960" y="274" width="210" height="64" rx="14" class="card"/>
+      <rect x="960" y="274" width="6" height="64" rx="3" fill="#22d3ee"/>
+      <text x="982" y="302" class="t b" font-size="13">EXPORT SIEM</text>
+      <text x="982" y="322" class="m" font-size="11">CEF / syslog vers la SIEM SOC</text>
+    </g>
+    <text x="960" y="414" class="s" font-size="11">Restitution : direction, sécurité</text>
+  </g>
+</svg>
