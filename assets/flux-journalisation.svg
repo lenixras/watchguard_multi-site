@@ -76,36 +76,36 @@
     <g>
       <rect x="40" y="80" width="260" height="60" rx="14" class="card"/>
       <rect x="40" y="80" width="6" height="60" rx="3" fill="#e4002b"/>
-      <text x="62" y="106" class="t b" font-size="13">SIEGE · FIREBOX M390</text>
-      <text x="62" y="126" class="m" font-size="11">Traffic + IPS + VPN + AppCtrl</text>
+      <text x="62" y="106" class="t b" font-size="12.5">SITE1-MG — SIÈGE</text>
+      <text x="62" y="126" class="m" font-size="11">Firebox M390 · Traffic, IPS, VPN</text>
       <rect x="228" y="94" width="60" height="18" rx="9" class="chip"/>
       <text x="258" y="107" text-anchor="middle" class="m" font-size="9.5">:4157</text>
     </g>
     <g>
       <rect x="40" y="165" width="260" height="60" rx="14" class="card"/>
       <rect x="40" y="165" width="6" height="60" rx="3" fill="#e4002b"/>
-      <text x="62" y="191" class="t b" font-size="13">AGENCE LYON · T20</text>
-      <text x="62" y="211" class="m" font-size="11">Traffic + WebBlocker + DNSWatch</text>
+      <text x="62" y="191" class="t b" font-size="12.5">SITE2-MG — AGENCE</text>
+      <text x="62" y="211" class="m" font-size="11">Firebox T20 · Traffic, WebBlocker</text>
       <rect x="228" y="179" width="60" height="18" rx="9" class="chip"/>
       <text x="258" y="192" text-anchor="middle" class="m" font-size="9.5">:4157</text>
     </g>
     <g>
       <rect x="40" y="250" width="260" height="60" rx="14" class="card"/>
       <rect x="40" y="250" width="6" height="60" rx="3" fill="#e4002b"/>
-      <text x="62" y="276" class="t b" font-size="13">STRASBOURG · T20</text>
-      <text x="62" y="296" class="m" font-size="11">Traffic + WebBlocker + DNSWatch</text>
+      <text x="62" y="276" class="t b" font-size="12.5">SITE3-MG — PRODUCTION</text>
+      <text x="62" y="296" class="m" font-size="11">Firebox M290 · Traffic OT, WebBlocker</text>
       <rect x="228" y="264" width="60" height="18" rx="9" class="chip"/>
       <text x="258" y="277" text-anchor="middle" class="m" font-size="9.5">:4157</text>
     </g>
     <g>
       <rect x="40" y="335" width="260" height="60" rx="14" class="card"/>
       <rect x="40" y="335" width="6" height="60" rx="3" fill="#e4002b"/>
-      <text x="62" y="361" class="t b" font-size="13">PRODUCTION · M290</text>
-      <text x="62" y="381" class="m" font-size="11">Traffic OT + alarms matériel</text>
+      <text x="62" y="361" class="t b" font-size="12.5">SITE4-MU — MAURICE</text>
+      <text x="62" y="381" class="m" font-size="11">Firebox T20 · Traffic, WebBlocker</text>
       <rect x="228" y="349" width="60" height="18" rx="9" class="chip"/>
       <text x="258" y="362" text-anchor="middle" class="m" font-size="9.5">:4157</text>
     </g>
-    <text x="40" y="414" class="s" font-size="11">Sources : tous les sites du parc</text>
+    <text x="40" y="414" class="s" font-size="11">Sources : SITE1-MG · SITE2-MG · SITE3-MG · SITE4-MU</text>
   </g>
 
   <!-- ================= DIMENSION ================= -->

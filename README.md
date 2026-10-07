@@ -1,6 +1,6 @@
 # Réseau multi-site avec WatchGuard
 
-> **Mise en place d'une architecture réseau sécurisée et interconnectée** — VPN IPsec inter-site, SD-WAN, filtrage sortant et journalisation centralisée sur un parc de sites reliés par Firebox / Fireware.
+> **Mise en place d'une architecture réseau sécurisée et interconnectée** — VPN IPsec inter-site, SD-WAN multi-FAI, filtrage sortant et journalisation centralisée sur 4 sites (Madagascar & Maurice) équipés de Firebox / Fireware.
 
 [![Status](https://img.shields.io/badge/status-d%C3%A9ploy%C3%A9-22c55e)](#aper%C3%A7u)
 [![Fireware](https://img.shields.io/badge/Fireware-12.x-E4002B?style=flat-square)](https://www.watchguard.com/help/docs/fireware/12/en-US/)
@@ -35,22 +35,30 @@
 
 ## Aperçu
 
-Parc de **5 sites** (siège, 2 agences, 1 site de production, population nomade) interconnectés en **maillage partiel hub-and-spoke** via des tunnels **IPsec BOVPN**, avec :
+Parc de **4 sites** — **SITE1-MG**, **SITE2-MG**, **SITE3-MG** (Madagascar) et **SITE4-MU** (Maurice) — interconnectés en **hub-and-spoke** via des tunnels **IPsec BOVPN**, avec :
+
+| Site | Rôle | Firebox | Liens d'accès (FAI) | Sous-réseau |
+|------|------|---------|---------------------|-------------|
+| **SITE1-MG** | Siège (hub) | **M390** | **FO-TELMA** · **FH-ORANGE** · **STARLINK** | `10.10.0.0/16` |
+| **SITE2-MG** | Agence | **T20** | **FO-TELMA** · **FH-ORANGE** · **STARLINK** | `10.20.0.0/16` |
+| **SITE3-MG** | Production | **M290** | **FO-TELMA** · **FH-ORANGE** · **STARLINK** | `10.30.0.0/16` |
+| **SITE4-MU** | Site Maurice | **T20** | **Emtel** · **my.t** | `10.40.0.0/16` |
 
 | Pilier | Réponse apportée |
 |--------|------------------|
-| **Connectivité** | Tunnels IPsec chiffrés entre tous les sites, routage dynamique (BGP) sur interfaces virtuelles |
+| **Connectivité** | Tunnels IPsec chiffrés entre les 4 sites, routage dynamique (BGP) sur interfaces virtuelles |
+| **Redondance FAI** | 3 liens par site MG (fibre ×2 + Starlink) et 2 liens à Maurice (Emtel, my.t) |
 | **Performance** | SD-WAN : choix de chemin selon latence / jitter / perte, équilibrage de charge et priorisation VoIP |
 | **Contrôle** | Politiques de filtrage par flux, WebBlocker (catégories d'URL), Application Control, IPS/GAV |
 | **Visibilité** | Tous les Firebox journalisent vers **WatchGuard Dimension** : rapports, alertes, preuves d'audit |
 
-**En une phrase :** un utilisateur d'agence atteint les applications du siège *comme s'il y était*, avec un trafic contrôlé, priorisé et intégralement tracé.
+**En une phrase :** un utilisateur de SITE2-MG, SITE3-MG ou SITE4-MU atteint les applications de SITE1-MG *comme s'il y était*, avec un trafic contrôlé, priorisé et intégralement tracé.
 
 ---
 
 ## Objectifs & contraintes
 
-- **Interconnecter** des sites hétérogènes (fibre, 4G de secours) sans MPLS coûteux.
+- **Interconnecter** les sites MG et MU avec du multi-FAI (3 liens à Madagascar, 2 à Maurice) sans MPLS coûteux.
 - **Garantir la continuité** des applicatifs critiques (ERP, VoIP, messagerie) en cas de dégradation d'un lien.
 - **Contrôler l'accès Internet** de tous les sites depuis un référentiel unique (pas de config locale divergente).
 - **Centraliser les logs** pour l'exploitation, la sécurité et les obligations d'audit.
@@ -62,35 +70,51 @@ Parc de **5 sites** (siège, 2 agences, 1 site de production, population nomade)
 
 ```mermaid
 flowchart TB
-    subgraph INT["Transit opérateur"]
-        ISP1["ISP-1 · FTTH 1 Gb/s"]
-        ISP2["ISP-2 · 4G (secours)"]
-    end
-
-    subgraph HQ["Siège — Firebox M390"]
-        FW0["Fireware 12.x<br/>BGP · Policy Manager"]
+    subgraph S1["SITE1-MG · siège (hub)"]
+        FW0["Firebox M390<br/>Fireware 12.x · BGP"]
         VLANs["VLAN 10 serveurs<br/>VLAN 20 utilisateurs<br/>VLAN 30 VoIP<br/>VLAN 40 IoT"]
         FW0 --- VLANs
     end
-
-    subgraph BR1["Agence Lyon — T20"]
+    subgraph S2["SITE2-MG · agence"]
         FW1["Firebox T20"]
     end
-    subgraph BR2["Agence Strasbourg — T20"]
-        FW2["Firebox T20"]
+    subgraph S3["SITE3-MG · production"]
+        FW2["Firebox M290"]
     end
-    subgraph BR3["Site production — M290"]
-        FW3["Firebox M290"]
+    subgraph S4["SITE4-MU · Maurice"]
+        FW3["Firebox T20"]
+    end
+
+    subgraph W1["Accès SITE1-MG"]
+        A1["FO-TELMA (fibre)"]
+        A2["FH-ORANGE (fibre)"]
+        A3["STARLINK"]
+    end
+    subgraph W2["Accès SITE2-MG"]
+        A4["FO-TELMA"]
+        A5["FH-ORANGE"]
+        A6["STARLINK"]
+    end
+    subgraph W3["Accès SITE3-MG"]
+        A7["FO-TELMA"]
+        A8["FH-ORANGE"]
+        A9["STARLINK"]
+    end
+    subgraph W4["Accès SITE4-MU"]
+        A10["Emtel"]
+        A11["my.t"]
     end
 
     DIM["WatchGuard Dimension<br/>logs · rapports · alertes"]
 
-    ISP1 --- FW0
-    ISP2 -. "failover" .- FW0
+    A1 & A2 & A3 --- FW0
+    A4 & A5 & A6 --- FW1
+    A7 & A8 & A9 --- FW2
+    A10 & A11 --- FW3
 
-    FW0 <==>|IPsec B1| FW1
-    FW0 <==>|IPsec B2| FW2
-    FW0 <==>|IPsec B3| FW3
+    FW0 <==>|IPsec B1 · SITE2-MG| FW1
+    FW0 <==>|IPsec B2 · SITE3-MG| FW2
+    FW0 <==>|IPsec B3 · SITE4-MU| FW3
 
     FW0 -. "syslog :4157" .-> DIM
     FW1 -. syslog .-> DIM
@@ -99,9 +123,11 @@ flowchart TB
 
     classDef wg fill:#e4002b,stroke:#7f1024,color:#fff
     classDef fw fill:#0ea5e9,stroke:#0369a1,color:#fff
+    classDef isp fill:#334155,stroke:#64748b,color:#fff
     classDef dim fill:#8b5cf6,stroke:#5b21b6,color:#fff
     class FW0 wg
-    class FW1,FW2,FW3,ISP1,ISP2 fw
+    class FW1,FW2,FW3 fw
+    class A1,A2,A3,A4,A5,A6,A7,A8,A9,A10,A11 isp
     class DIM dim
 ```
 
@@ -109,9 +135,9 @@ flowchart TB
 
 ```mermaid
 sequenceDiagram
-    participant A as Agence · Firebox T20
-    participant I as Internet (NAT opérateur)
-    participant S as Siège · Firebox M390
+    participant A as SITE2-MG · Firebox T20
+    participant I as Internet (NAT opérateur · FO-TELMA)
+    participant S as SITE1-MG · Firebox M390
 
     Note over A,S: Phase 1 — IKE_SA_INIT
     A->>I: UDP 500/4500 · proposal AES-256-GCM / DH19 / SHA-256
@@ -119,13 +145,15 @@ sequenceDiagram
     S-->>A: SA acceptée · PFS group 19
 
     Note over A,S: Phase 2 — CREATE_CHILD_SA (IPsec)
-    A->>S: traffic selectors 10.20.10.0/24 ↔ 10.10.0.0/16
+    A->>S: traffic selectors 10.20.0.0/16 ↔ 10.10.0.0/16
     S-->>A: IPsec SA établie · rekey automatique
 
     Note over A,S: Tunnel up — BGP (BOVPN virtual interface)
     A->>S: OPENKEEPALIVE + annonce routes site
     S-->>A: routes du siège apprises · ping de contrôle
 ```
+
+Le même échange concerne **SITE3-MG** (`10.30.0.0/16`) et **SITE4-MU** (`10.40.0.0/16`) — pour ce dernier, la négociation IKEv2 transite par les liens **Emtel / my.t** côté mauricien et **FO-TELMA / STARLINK** côté siège (trajet international, latence plus élevée).
 
 **Répartition du trafic observée** (exemple de reporting Dimension sur 30 jours) :
 
@@ -146,7 +174,7 @@ pie showData
 
 ### 1 · VPN IPsec inter-site
 
-Interconnexion **BOVPN** (*Branch Office VPN*) entre le siège et chaque site, en **mode routeur** avec *BOVPN virtual interfaces* pour supporter le routage dynamique.
+Interconnexion **BOVPN** (*Branch Office VPN*) entre le hub **SITE1-MG** et chaque site (**SITE2-MG**, **SITE3-MG**, **SITE4-MU**), en **mode routeur** avec *BOVPN virtual interfaces* pour supporter le routage dynamique :
 
 | Paramètre | Choix retenu | Pourquoi |
 |-----------|--------------|----------|
@@ -154,10 +182,11 @@ Interconnexion **BOVPN** (*Branch Office VPN*) entre le siège et chaque site, e
 | Cipher | **AES-256-GCM** | Chiffrement + authentification en une passe (performances matérielles) |
 | Intégrité | SHA-256 / DH group 19 (ECP-256) | Compromis sécurité / coût CPU Firebox |
 | PFS | Activé (DH 19) | Clés de rekey isolées de la SA Phase 1 |
-| Topologie | Hub-and-spoke, **virtual interfaces** | Permet BGP, ajout d'un site sans retoucher 4 configurations |
-| Routage | **BGP** (ou routes statiques dépendantes de la PBR) | Basculer un site vers le 4G en annonçant une métrique moins bonne |
-| Redondance | 2 tunnels/site + DPD (*Dead Peer Detection*) | Détection de coupure < 10 s, bascule automatique |
-| Accès nomades | SSL VPN / IKEv2 client | Même référentiel de politiques que les sites |
+| Liens transport | MG : **FO-TELMA + FH-ORANGE** (actifs) + **STARLINK** (secours) — MU : **Emtel + my.t** | Diversité opérateur, aucune dépendance à un seul FAI |
+| Topologie | Hub-and-spoke sur **SITE1-MG**, *virtual interfaces* | Permet BGP, ajout d'un site sans retoucher 4 configurations |
+| Routage | **BGP** (ou routes statiques dépendantes de la PBR) | Basculer un site vers Starlink / le FAI de secours avec une métrique dégradée |
+| Redondance | 2 tunnels/site + DPD (*Dead Peer Detection*) + keepalive BGP | Détection de coupure < 10 s, bascule automatique |
+| Accès nomades | SSL VPN / IKEv2 client sur SITE1-MG | Même référentiel de politiques que les sites |
 
 **Contrôle d'admission** : chaque tunnel n'accepte que les sous-réseaux déclarés dans les *traffic selectors* — un site compromis ne peut pas explorer le reste du parc.
 
@@ -165,8 +194,8 @@ Interconnexion **BOVPN** (*Branch Office VPN*) entre le siège et chaque site, e
 <summary><b>Extrait de politique Fireware — flux inter-site (BOVPN)</b></summary>
 
 ```text
-Policy      : HQ-SRV-to-BR-ALL
-From        : Any-External / BOVPN-VIF-*   →   To : Branch-Networks
+Policy      : SITE1-to-SITES
+From        : Any-External / BOVPN-VIF-*   →   To : Site-Networks (10.20 / 10.30 / 10.40.0.0/16)
 Action      : Allow
 NAT         : Dynamic (IP de l'interface sortante)
 Scan        : Gateway AntiVirus ✔  IPS ✔  Application Control ✔
@@ -176,8 +205,8 @@ Logging     : Snmp Trap + Dimension
 ```
 
 ```text
-Policy      : BR-ALL-to-HQ-SRV
-From        : Branch-Networks   →   To : HQ-Servers (VLAN 10)
+Policy      : SITES-to-SITE1-SRV
+From        : 10.20.0.0/16, 10.30.0.0/16, 10.40.0.0/16   →   To : SITE1-Servers (VLAN 10)
 Action      : Allow — ports 443, 3389/RDP (jump host), 5432, 445
 Refus       : toute autre destination → log + alerte
 ```
@@ -192,23 +221,25 @@ Les politiques **SD-WAN** de Fireware décident, *à chaque paquet*, du lien et 
 
 | Priorité | Trafic | Chemin principal | Chemin de secours | Déclencheur de bascule |
 |----------|--------|------------------|-------------------|------------------------|
-| 1 | VoIP / Teams (UDP audio) | WAN1 fibre | WAN2 4G | perte > 1 % **ou** jitter > 30 ms |
-| 2 | ERP, messagerie | WAN1 fibre | WAN2 4G | latence > 150 ms pendant 5 s |
-| 3 | Web / HTTPS | Load-balancing WAN1 + WAN2 | — | lien dégradé (réservation 4G) |
-| 4 | Sauvegardes, mises à jour | WAN1 (fenêtre horaire) | — | — |
+| 1 | VoIP / Teams (UDP audio) | **FO-TELMA** (fibre) | **FH-ORANGE** → **STARLINK** | perte > 1 % **ou** jitter > 30 ms |
+| 2 | ERP, messagerie | **FO-TELMA** | **FH-ORANGE** → **STARLINK** | latence > 150 ms pendant 5 s |
+| 3 | Web / HTTPS | Load-balancing FO-TELMA + FH-ORANGE | STARLINK en complément | lien dégradé (réservation satellite) |
+| 4 | Sauvegardes, mises à jour | **FO-TELMA** (fenêtre horaire) | — | — |
 
-- **Load-balancing** : répartition par *round-robin* pondéré (1 Gb/s vs 4G) sur le trafic non critique.
-- **QoS sortant** : files de priorité *high / normal / low* — la VoIP passe toujours en premier, les sauvegardes sont limiter en débit pour ne jamais saturer le lien.
-- **Multilink / failover** : le WAN 4G reste en *cold standby* réservé (ou en partage de charge selon la règle), évitant la facturation 4G inutile.
-- **Visibilité** : dans WatchGuard Cloud, latence/jitter/perte par site et par WAN, avec historique — ce qui alimente les décisions de renouvellement d'offre opérateur.
+> **SITE4-MU** dispose de 2 liens seulement : **Emtel** en principal, **my.t** en secours — mêmes règles de priorité, seuils adaptés à la latence internationale.
+
+- **Load-balancing** : répartition *round-robin* pondérée entre FO-TELMA et FH-ORANGE sur le trafic non critique (Starlink gardé pour le repli).
+- **QoS sortant** : files de priorité *high / normal / low* — la VoIP passe toujours en premier, les sauvegardes sont limitées en débit pour ne jamais saturer le lien.
+- **Multi-FAI** : chaque site MG embarque **3 liens** (2 fibres + satellite) et chaque site MU **2 liens** — un FAI peut tomber sans impact métier.
+- **Visibilité** : dans WatchGuard Cloud, latence/jitter/perte **par site et par FAI**, avec historique — ce qui alimente les décisions de renouvellement d'offre opérateur.
 
 ```mermaid
 flowchart LR
     T["Paquet sortant"] --> D{"SD-WAN policy match ?"}
-    D -->|"VoIP"| P1["File haute · WAN1<br/>repli WAN2 si jitter > 30 ms"]
-    D -->|"ERP / mail"| P2["File normale · WAN1<br/>repli WAN2 si latence > 150 ms"]
-    D -->|"Web"| P3["Load-balancing<br/>WAN1 + WAN2"]
-    D -->|"Backup"| P4["File basse · WAN1<br/>limitée à 30 % du débit"]
+    D -->|"VoIP"| P1["File haute · FO-TELMA<br/>repli FH-ORANGE / STARLINK si jitter > 30 ms"]
+    D -->|"ERP / mail"| P2["File normale · FO-TELMA<br/>repli FH-ORANGE si latence > 150 ms"]
+    D -->|"Web"| P3["Load-balancing<br/>FO-TELMA + FH-ORANGE"]
+    D -->|"Backup"| P4["File basse · FO-TELMA<br/>limitée à 30 % du débit"]
     P1 --> O["Sortie site"]
     P2 --> O
     P3 --> O
@@ -280,7 +311,7 @@ Chaque refus est **loggé** (utilisateur, FQDN, catégorie, site) → visible da
 1. **Top destinations / utilisateurs** — détecter un poste qui exfiltre, un flux anormal la nuit.
 2. **WebBlocker — refus par catégorie** — piloter le réglage des politiques (et la formation des équipes).
 3. **Menaces bloquées** — volume, origine, évolution après chaque campagne de phishing.
-4. **Disponibilité des tunnels / liens** — prouver le respect du SLA et justifier les bascules 4G.
+4. **Disponibilité des tunnels / liens** — prouver le respect du SLA et justifier les bascules de FAI (FO-TELMA → FH-ORANGE → STARLINK / Emtel → my.t).
 5. **Connexions VPN nomades** — qui s'est connecté, d'où, quand (obligation d'audit).
 
 ---
@@ -303,8 +334,9 @@ Règle transverse : **un VLAN n'atteint un autre VLAN que par une politique expl
 
 | Scénario | Comportement observé | Critère de succès |
 |----------|----------------------|-------------------|
-| Coupure fibre (ISP-1) | Bascule WAN2 4G, BGP ré-annonce avec métrique dégradée | Sessions critiques rétablies < 60 s |
-| Mort d'un Firebox d'agence | DPD détecte, tunnel côté siège rejeté, alerte Dimension | Alerte reçue, coupure visible dans les rapports |
+| Coupure **FO-TELMA** (site MG) | Bascule vers **FH-ORANGE**, puis STARLINK ; BGP ré-annonce avec métrique dégradée | Sessions critiques rétablies < 60 s |
+| Coupure **Emtel** (SITE4-MU) | Bascule vers **my.t**, tunnel IPsec réétabli | SITE4-MU joignable < 90 s |
+| Mort d'un Firebox (SITE2 / 3 / 4) | DPD détecte, tunnel côté SITE1-MG rejeté, alerte Dimension | Alerte reçue, coupure visible dans les rapports |
 | Dégradation latence (SD-WAN) | Bascule VoIP/ERP vers le lien sain | Aucune coupure perceptible en réunion Teams |
 | Panne Dimension | Les Firebox continuent de journaliser localement | Pas d'impact sur le trafic, resynchronisation ensuite |
 
@@ -320,8 +352,8 @@ timeline
     phase 1 : Audit & relevés : Sites, liens, flux, VLANs existants
     phase 2 : Conception : Plan d'adressage, topologie VPN, profils de politiques
     phase 3 : Baie de test : Firebox de lab, validation IKEv2 / SD-WAN / WebBlocker
-    phase 4 : Déploiement siège : M390 en production, Dimension, premiers tunnels
-    phase 5 : Vague agences : T20/M290, reprise des politiques depuis Policy Manager
+    phase 4 : Déploiement SITE1-MG : M390 en production, Dimension, hub BGP
+    phase 5 : Vague sites : SITE2-MG (T20), SITE3-MG (M290), SITE4-MU (T20 · Emtel/my.t)
     phase 6 : Durcissement : WebBlocker, IPS, DNSWatch, rapports planifiés
     phase 7 : Recette & runbooks : Tests de bascule, procédures, transfert d'exploitation
 ```
@@ -341,11 +373,11 @@ timeline
 <!-- Ajuste les chiffres ci-dessous à ta propre expérience -->
 | Indicateur | Avant | Après |
 |------------|-------|-------|
-| Inter-sites | MPLS partiel, 1 lien unique par site | 5 sites en IPsec + redondance 4G automatique |
+| Inter-sites | MPLS partiel, 1 lien unique par site | 4 sites en IPsec + 3 FAI/site MG, 2 FAI/site MU |
 | Temps d'établissement d'un nouveau site | Provisionnement opérateur (semaines) | Firebox livrée + tunnel configuré en **< 1 j** |
 | Contrôle Internet | Politiques locales divergentes | Référentiel **unique**, poussé à tous les sites |
 | Visibilité | Logs sur chaque boîte, consultation rare | Dimension centralisée : rapports hebdo + alertes |
-| Continuity VoIP | 1 seul lien, coupures perçues | Bascule SD-WAN transparente (jitter/perte) |
+| Continuité VoIP | 1 seul lien par site, coupures perçues | Bascule SD-WAN transparente (FO-TELMA → FH-ORANGE → STARLINK) |
 | Audit | Captures d'écran manuelles | Rapports Dimension exportables, rétention 30 j |
 
 ---
@@ -369,10 +401,11 @@ timeline
 
 | Rôle | Solution |
 |------|----------|
-| Pare-feu / routeur | WatchGuard Firebox **M390** (siège), **M290** (production), **T20** (agences) |
+| Pare-feu / routeur | WatchGuard Firebox **M390** (SITE1-MG), **T20** (SITE2-MG, SITE4-MU), **M290** (SITE3-MG) |
+| Accès WAN | **FO-TELMA** + **FH-ORANGE** + **STARLINK** (sites MG) · **Emtel** + **my.t** (SITE4-MU) |
 | OS | **Fireware 12.x** |
-| Interconnexion | IPsec **BOVPN** (virtual interfaces) + BGP |
-| SD-WAN | Politiques SD-WAN Fireware + Multilink |
+| Interconnexion | IPsec **BOVPN** hub-and-spoke sur SITE1-MG (virtual interfaces) + BGP |
+| SD-WAN | Politiques SD-WAN Fireware + Multilink multi-FAI |
 | Filtrage | WebBlocker, DNSWatch, Application Control, IPS, Gateway AntiVirus, APT Blocker |
 | Gestion & logs | **WatchGuard Cloud** / WSM Policy Manager + **WatchGuard Dimension** |
 | Nomades | SSL VPN / client IKEv2, MFA |
